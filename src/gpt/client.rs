@@ -5,40 +5,24 @@ use reqwest::{ClientBuilder, header};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    LLMAPI,
+    GptAPI,
     errors::ClientError,
-    types::{ClientResult, ErrorResponse, LLMProvider},
+    types::{ClientResult, ErrorResponse},
 };
 
-impl LLMAPI {
+impl GptAPI {
     pub fn from_env() -> Self {
-        let provider = env::var("LLM_PROVIDER").expect("Failed to load env variable: LLM_PROVIDER");
-        let provider: LLMProvider = provider.into();
-
         let mut headers = header::HeaderMap::new();
         headers.insert(
             header::CONTENT_TYPE,
             header::HeaderValue::from_static("application/json"),
         );
-
-        let api_key = match &provider {
-            LLMProvider::Gpt => {
-                let api_key = env::var("OPENAI_API_KEY")
-                    .expect("Failed to load env variable: OPENAI_API_KEY");
-                headers.insert(
-                    header::AUTHORIZATION,
-                    format!("Bearer {}", &api_key).parse().unwrap(),
-                );
-                api_key
-            }
-            LLMProvider::Gemini => {
-                let api_key = env::var("GOOGLE_API_KEY")
-                    .expect("Failed to load env variable: GOOGLE_API_KEY");
-                headers.insert("x-goog-api-key", api_key.parse().unwrap());
-
-                api_key
-            }
-        };
+        let api_key =
+            env::var("OPENAI_API_KEY").expect("Failed to load env variable: OPENAI_API_KEY");
+        headers.insert(
+            header::AUTHORIZATION,
+            format!("Bearer {}", &api_key).parse().unwrap(),
+        );
 
         Self {
             client: ClientBuilder::new()
@@ -47,7 +31,6 @@ impl LLMAPI {
                 .timeout(Duration::from_secs(30))
                 .build()
                 .expect("Failed to build HTTP client"),
-            provider,
         }
     }
 
@@ -56,7 +39,6 @@ impl LLMAPI {
         url: String,
         body: T,
     ) -> ClientResult<U> {
-        // provider에 따른 send
         let res = self.client.post(url).json(&body).send().await?;
 
         if !res.status().is_success() {

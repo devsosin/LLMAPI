@@ -1,17 +1,21 @@
 use reqwest::Client;
 
-use crate::types::LLMProvider;
-
-pub mod client;
 pub mod errors;
 pub mod traits;
 pub mod types;
 
-// llm services
-pub mod gemini;
+#[cfg(feature = "gpt")]
 pub mod gpt;
 
-pub struct LLMAPI {
+#[cfg(feature = "gpt")]
+pub struct GptAPI {
     client: Client,
-    provider: LLMProvider,
+}
+
+#[cfg(feature = "gemini")]
+pub mod gemini;
+
+#[cfg(feature = "gemini")]
+pub struct GeminiAPI {
+    client: Client,
 }

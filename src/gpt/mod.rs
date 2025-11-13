@@ -1,15 +1,15 @@
 use crate::{
-    LLMAPI,
+    GptAPI,
     gpt::dto::{request::GptRequestBody, response::GptResponse},
     traits::TextGenerationService,
     types::ClientResult,
 };
 
+pub mod client;
 pub mod dto;
 pub mod types;
 
-// TODO?: Split LLMAPI to GptAPI, GeminiAPI -> dependencies with features (gpt, gemini)
-impl TextGenerationService for LLMAPI {
+impl TextGenerationService for GptAPI {
     async fn generate_text(&self, model: &str, input: &str) -> ClientResult<()> {
         let body = GptRequestBody::new(model, input);
 
