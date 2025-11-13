@@ -7,10 +7,12 @@ use crate::{
 
 pub mod client;
 pub mod dto;
+pub mod models;
 pub mod types;
 
 impl TextGenerationService for GptAPI {
-    async fn generate_text(&self, model: &str, input: &str) -> ClientResult<()> {
+    type Response = GptResponse;
+    async fn generate_text(&self, model: &str, input: &str) -> ClientResult<Self::Response> {
         let body = GptRequestBody::new(model, input);
 
         let response = self
@@ -22,6 +24,6 @@ impl TextGenerationService for GptAPI {
 
         println!("{:?}", response);
 
-        Ok(())
+        Ok(response)
     }
 }

@@ -2,7 +2,7 @@ use serde::Deserialize;
 
 use crate::gpt::types::Role;
 
-// TODO: move to types.rs
+// TODO: move to types.rs when implement other generation models
 #[derive(Deserialize, Debug)]
 pub struct GptResponse {
     id: String,

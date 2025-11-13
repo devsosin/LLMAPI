@@ -1,6 +1,6 @@
 use serde::Serialize;
 
-use crate::gpt::types::GptModel;
+use crate::gpt::models::GptModel;
 
 #[derive(Serialize)]
 pub struct GptRequestBody {

@@ -27,10 +27,10 @@ pub struct ErrorResponse {
 #[derive(Deserialize)]
 pub struct ErrorDetail {
     message: String,
-    #[serde(rename(deserialize = "type"))]
-    error_type: String,
-    param: String,
-    code: String,
+    // #[serde(rename(deserialize = "type"))]
+    // error_type: String,
+    // param: String,
+    // code: String,
 }
 
 impl ErrorResponse {
@@ -38,3 +38,27 @@ impl ErrorResponse {
         &self.error.message
     }
 }
+
+// Gemini Error Response
+// {
+//   "error": {
+//     "code": 400,
+//     "message": "API key not valid. Please pass a valid API key.",
+//     "status": "INVALID_ARGUMENT",
+//     "details": [
+//       {
+//         "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+//         "reason": "API_KEY_INVALID",
+//         "domain": "googleapis.com",
+//         "metadata": {
+//           "service": "generativelanguage.googleapis.com"
+//         }
+//       },
+//       {
+//         "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+//         "locale": "en-US",
+//         "message": "API key not valid. Please pass a valid API key."
+//       }
+//     ]
+//   }
+// }
