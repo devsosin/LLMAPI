@@ -16,8 +16,13 @@ pub mod types;
 impl TextGenerationService for GeminiAPI {
     type Response = GeminiResponse;
 
-    async fn generate_text(&self, model: &str, input: &str) -> ClientResult<Self::Response> {
-        let body = GeminiRequestBody::new(input);
+    async fn generate_text(
+        &self,
+        model: &str,
+        instruction: &str,
+        input: &str,
+    ) -> ClientResult<Self::Response> {
+        let body = GeminiRequestBody::new(instruction, input);
         let model: GeminiModel = model.into();
 
         let response = self
@@ -30,7 +35,7 @@ impl TextGenerationService for GeminiAPI {
             )
             .await?;
 
-        println!("{:?}", response);
+        // println!("{:?}", response);
 
         Ok(response)
     }

@@ -6,6 +6,7 @@ pub trait TextGenerationService {
     fn generate_text(
         &self,
         model: &str,
+        instruction: &str,
         input: &str,
     ) -> impl Future<Output = ClientResult<Self::Response>>;
 }

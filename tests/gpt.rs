@@ -1,4 +1,5 @@
 #[cfg(test)]
+#[cfg(feature = "gpt")]
 mod test {
     use dotenv::dotenv;
     use llm::{GptAPI, traits::TextGenerationService};
@@ -9,7 +10,7 @@ mod test {
 
         let api = GptAPI::from_env();
 
-        let result = api.generate_text("gpt-5", "hello gpt !").await.unwrap();
+        let result = api.generate_text("gpt-5", "", "hello gpt !").await.unwrap();
 
         println!("{:?}", result);
     }

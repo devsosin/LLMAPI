@@ -12,7 +12,13 @@ pub mod types;
 
 impl TextGenerationService for GptAPI {
     type Response = GptResponse;
-    async fn generate_text(&self, model: &str, input: &str) -> ClientResult<Self::Response> {
+
+    async fn generate_text(
+        &self,
+        model: &str,
+        instruction: &str,
+        input: &str,
+    ) -> ClientResult<Self::Response> {
         let body = GptRequestBody::new(model, input);
 
         let response = self
@@ -22,7 +28,7 @@ impl TextGenerationService for GptAPI {
             )
             .await?;
 
-        println!("{:?}", response);
+        // println!("{:?}", response);
 
         Ok(response)
     }
