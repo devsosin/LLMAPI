@@ -20,7 +20,7 @@ impl TextGenerationService for GptAPI {
         input: &str,
         think_more: bool,
     ) -> ClientResult<Self::Response> {
-        let body = GptRequestBody::new(model, input);
+        let body = GptRequestBody::new(model, instruction, input, think_more);
 
         let response = self
             .send::<GptRequestBody, GptResponse>(

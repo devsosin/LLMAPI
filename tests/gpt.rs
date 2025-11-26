@@ -10,7 +10,10 @@ mod test {
 
         let api = GptAPI::from_env();
 
-        let result = api.generate_text("gpt-5", "", "hello gpt !").await.unwrap();
+        let result = api
+            .generate_text("gpt-5", "", "hello gpt !", false)
+            .await
+            .unwrap();
 
         println!("{:?}", result);
     }

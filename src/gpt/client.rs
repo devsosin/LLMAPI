@@ -28,7 +28,7 @@ impl GptAPI {
             client: ClientBuilder::new()
                 .user_agent("LLM-Rust/1.0.0")
                 .default_headers(headers)
-                .timeout(Duration::from_secs(30))
+                .timeout(Duration::from_secs(120))
                 .build()
                 .expect("Failed to build HTTP client"),
         }

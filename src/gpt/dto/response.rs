@@ -16,6 +16,22 @@ pub struct GptResponse {
     usage: Usage,
 }
 
+impl GptResponse {
+    pub fn get_content(&self) -> &str {
+        &self
+            .output
+            .last()
+            .unwrap()
+            .content
+            .as_ref()
+            .unwrap()
+            .last()
+            .unwrap()
+            .text
+            .as_ref()
+    }
+}
+
 #[derive(Deserialize, Debug)]
 pub struct Billing {
     payer: String,
