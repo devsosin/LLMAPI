@@ -11,7 +11,7 @@ mod test {
         let api = GeminiAPI::from_env();
 
         let result = api
-            .generate_text("gemini-3-pro-preview", "", "hello gemini !")
+            .generate_text("gemini-3-pro-preview", "", "hello gemini !", false)
             .await
             .unwrap();
 

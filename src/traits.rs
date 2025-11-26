@@ -8,6 +8,7 @@ pub trait TextGenerationService {
         model: &str,
         instruction: &str,
         input: &str,
+        think_more: bool,
     ) -> impl Future<Output = ClientResult<Self::Response>>;
 }
 

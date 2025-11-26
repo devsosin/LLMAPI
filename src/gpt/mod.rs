@@ -18,6 +18,7 @@ impl TextGenerationService for GptAPI {
         model: &str,
         instruction: &str,
         input: &str,
+        think_more: bool,
     ) -> ClientResult<Self::Response> {
         let body = GptRequestBody::new(model, input);
 

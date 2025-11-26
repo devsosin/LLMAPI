@@ -21,8 +21,9 @@ impl TextGenerationService for GeminiAPI {
         model: &str,
         instruction: &str,
         input: &str,
+        think_more: bool,
     ) -> ClientResult<Self::Response> {
-        let body = GeminiRequestBody::new(instruction, input);
+        let body = GeminiRequestBody::new(instruction, input, think_more);
         let model: GeminiModel = model.into();
 
         let response = self
