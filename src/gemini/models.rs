@@ -1,5 +1,4 @@
 use serde::Deserialize;
-
 #[derive(Deserialize, Debug)]
 pub enum GeminiModel {
     #[serde(rename(deserialize = "gemini-2.5-flash"))]
@@ -8,21 +7,12 @@ pub enum GeminiModel {
     Gemini3ProPreview,
 }
 
-impl From<&str> for GeminiModel {
-    fn from(s: &str) -> Self {
-        match s {
-            "gemini-2.5-flash" => Self::Gemini25Flash,
-            "gemini-3-pro-preview" => Self::Gemini3ProPreview,
-            _ => Self::Gemini25Flash,
-        }
-    }
-}
-
-impl GeminiModel {
-    pub fn as_str(&self) -> &str {
+impl ToString for GeminiModel {
+    fn to_string(&self) -> String {
         match self {
             GeminiModel::Gemini25Flash => "gemini-2.5-flash",
             GeminiModel::Gemini3ProPreview => "gemini-3-pro-preview",
         }
+        .into()
     }
 }

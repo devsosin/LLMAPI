@@ -1,26 +1,38 @@
 use crate::{
     GptAPI,
-    gpt::dto::{request::GptRequestBody, response::GptResponse},
-    traits::TextGenerationService,
-    types::ClientResult,
+    gpt::{
+        dto::{request::GptRequestBody, response::GptResponse},
+        models::GptModel,
+    },
+    traits::{ModelSelection, TextGenerationService},
+    types::{AgentTextRequest, AgentTextResponse, ClientResult},
 };
 
-pub mod client;
-pub mod dto;
+mod client;
+mod dto;
 pub mod models;
 pub mod types;
 
-impl TextGenerationService for GptAPI {
-    type Response = GptResponse;
+impl ModelSelection for GptAPI {
+    type Model = GptModel;
 
+    fn get_model_str(&self, model: Self::Model) -> String {
+        model.to_string()
+    }
+}
+
+impl TextGenerationService for GptAPI {
     async fn generate_text(
         &self,
-        model: &str,
-        instruction: &str,
-        input: &str,
-        think_more: bool,
-    ) -> ClientResult<Self::Response> {
-        let body = GptRequestBody::new(model, instruction, input, think_more);
+        model: Self::Model,
+        request: AgentTextRequest,
+    ) -> ClientResult<AgentTextResponse> {
+        let body = GptRequestBody::new(
+            model,
+            &request.instruction,
+            &request.input,
+            request.think_more,
+        );
 
         let response = self
             .send::<GptRequestBody, GptResponse>(
@@ -31,6 +43,6 @@ impl TextGenerationService for GptAPI {
 
         // println!("{:?}", response);
 
-        Ok(response)
+        Ok(response.into())
     }
 }

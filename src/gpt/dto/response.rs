@@ -1,8 +1,7 @@
 use serde::Deserialize;
 
-use crate::gpt::types::Role;
+use crate::{gpt::types::Role, types::AgentTextResponse};
 
-// TODO: move to types.rs when implement other generation models
 #[derive(Deserialize, Debug)]
 pub struct GptResponse {
     id: String,
@@ -14,6 +13,12 @@ pub struct GptResponse {
     model: String,
     output: Vec<Message>,
     usage: Usage,
+}
+
+impl Into<AgentTextResponse> for GptResponse {
+    fn into(self) -> AgentTextResponse {
+        AgentTextResponse::new(&self.id, self.get_content())
+    }
 }
 
 impl GptResponse {

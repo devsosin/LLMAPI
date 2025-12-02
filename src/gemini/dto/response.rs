@@ -1,6 +1,9 @@
 use serde::Deserialize;
 
-use crate::gemini::{models::GeminiModel, types::Content};
+use crate::{
+    gemini::{models::GeminiModel, types::Content},
+    types::AgentTextResponse,
+};
 
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -11,17 +14,20 @@ pub struct GeminiResponse {
     response_id: String,
 }
 
+impl Into<AgentTextResponse> for GeminiResponse {
+    fn into(self) -> AgentTextResponse {
+        AgentTextResponse::new(
+            &self.response_id,
+            self.candidates.last().unwrap().content.get_text(),
+        )
+    }
+}
+
 #[derive(Deserialize, Debug)]
 pub struct Candidate {
     content: Content,
     // finish_reason: Option<String>,
     // index: i32
-}
-
-impl GeminiResponse {
-    pub fn get_content(&self) -> &str {
-        self.candidates.last().unwrap().content.get_text()
-    }
 }
 
 #[derive(Deserialize, Debug)]

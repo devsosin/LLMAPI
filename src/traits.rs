@@ -1,17 +1,20 @@
-use crate::types::ClientResult;
+use crate::types::{AgentTextRequest, AgentTextResponse, ClientResult};
 
-pub trait TextGenerationService {
-    type Response;
+// TODO? is needed?
+pub trait ModelSelection {
+    type Model;
 
-    fn generate_text(
-        &self,
-        model: &str,
-        instruction: &str,
-        input: &str,
-        think_more: bool,
-    ) -> impl Future<Output = ClientResult<Self::Response>>;
+    fn get_model_str(&self, model: Self::Model) -> String;
 }
 
-pub trait ImageGenerationService {
+pub trait TextGenerationService: ModelSelection {
+    fn generate_text(
+        &self,
+        model: Self::Model,
+        request: AgentTextRequest,
+    ) -> impl Future<Output = ClientResult<AgentTextResponse>>;
+}
+
+pub trait ImageGenerationService: ModelSelection {
     fn generate_image(&self) -> impl Future<Output = ClientResult<()>>;
 }

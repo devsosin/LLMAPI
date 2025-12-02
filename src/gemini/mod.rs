@@ -4,33 +4,36 @@ use crate::{
         dto::{request::GeminiRequestBody, response::GeminiResponse},
         models::GeminiModel,
     },
-    traits::TextGenerationService,
-    types::ClientResult,
+    traits::{ModelSelection, TextGenerationService},
+    types::{AgentTextRequest, AgentTextResponse, ClientResult},
 };
 
-pub mod client;
-pub mod dto;
+mod client;
+mod dto;
 pub mod models;
 pub mod types;
 
-impl TextGenerationService for GeminiAPI {
-    type Response = GeminiResponse;
+impl ModelSelection for GeminiAPI {
+    type Model = GeminiModel;
 
+    fn get_model_str(&self, model: Self::Model) -> String {
+        model.to_string()
+    }
+}
+
+impl TextGenerationService for GeminiAPI {
     async fn generate_text(
         &self,
-        model: &str,
-        instruction: &str,
-        input: &str,
-        think_more: bool,
-    ) -> ClientResult<Self::Response> {
-        let body = GeminiRequestBody::new(instruction, input, think_more);
-        let model: GeminiModel = model.into();
+        model: GeminiModel,
+        request: AgentTextRequest,
+    ) -> ClientResult<AgentTextResponse> {
+        let body = request.into();
 
         let response = self
             .send::<GeminiRequestBody, GeminiResponse>(
                 format!(
                     "https://generativelanguage.googleapis.com/v1beta/models/{}:generateContent",
-                    model.as_str()
+                    model.to_string()
                 ),
                 body,
             )
@@ -38,6 +41,6 @@ impl TextGenerationService for GeminiAPI {
 
         // println!("{:?}", response);
 
-        Ok(response)
+        Ok(response.into())
     }
 }

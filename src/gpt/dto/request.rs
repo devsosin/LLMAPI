@@ -16,18 +16,22 @@ struct ReasoningConfig {
 }
 
 impl GptRequestBody {
-    pub fn new(model: &str, instructions: &str, input: &str, reasoning: bool) -> Self {
+    pub fn new(model: GptModel, instructions: &str, input: &str, reasoning: bool) -> Self {
         Self {
-            model: model.into(),
-            reasoning: if reasoning {
-                None
-            } else {
+            reasoning: if model.is_reasoning() {
                 Some(ReasoningConfig {
-                    effort: "low".into(),
+                    effort: match reasoning {
+                        true => "high",
+                        false => "low",
+                    }
+                    .into(),
                 })
+            } else {
+                None
             },
             instructions: instructions.into(),
             input: input.into(),
+            model,
         }
     }
 }

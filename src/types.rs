@@ -19,6 +19,45 @@ impl From<String> for LLMProvider {
     }
 }
 
+pub struct AgentTextRequest {
+    pub instruction: String,
+    pub input: String,
+    pub think_more: bool,
+}
+
+impl AgentTextRequest {
+    pub fn new(instruction: &str, input: &str, think_more: bool) -> Self {
+        Self {
+            instruction: instruction.into(),
+            input: input.into(),
+            think_more,
+        }
+    }
+}
+
+// TODO: String or byte like array? (Image)
+pub struct AgentTextResponse {
+    response_id: String,
+    content: String,
+}
+
+impl AgentTextResponse {
+    pub fn new(response_id: &str, content: &str) -> Self {
+        Self {
+            response_id: response_id.into(),
+            content: content.into(),
+        }
+    }
+
+    pub fn get_response_id(&self) -> &str {
+        &self.response_id
+    }
+
+    pub fn get_content(&self) -> &str {
+        &self.content
+    }
+}
+
 #[derive(Deserialize)]
 pub struct ErrorResponse {
     error: ErrorDetail,
