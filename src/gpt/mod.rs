@@ -1,5 +1,5 @@
 use crate::{
-    GptAPI,
+    AuthedGPTAPI,
     gpt::{
         dto::{request::GptRequestBody, response::GptResponse},
         models::GptModel,
@@ -13,7 +13,7 @@ mod dto;
 pub mod models;
 pub mod types;
 
-impl ModelSelection for GptAPI {
+impl<'a> ModelSelection for AuthedGPTAPI<'a> {
     type Model = GptModel;
 
     fn get_model_str(&self, model: Self::Model) -> String {
@@ -21,7 +21,7 @@ impl ModelSelection for GptAPI {
     }
 }
 
-impl TextGenerationService for GptAPI {
+impl<'a> TextGenerationService for AuthedGPTAPI<'a> {
     async fn generate_text(
         &self,
         model: Self::Model,

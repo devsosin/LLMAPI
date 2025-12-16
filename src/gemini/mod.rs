@@ -1,5 +1,5 @@
 use crate::{
-    GeminiAPI,
+    AuthedGeminiAPI,
     gemini::{
         dto::{request::GeminiRequestBody, response::GeminiResponse},
         models::GeminiModel,
@@ -13,7 +13,7 @@ mod dto;
 pub mod models;
 pub mod types;
 
-impl ModelSelection for GeminiAPI {
+impl<'a> ModelSelection for AuthedGeminiAPI<'a> {
     type Model = GeminiModel;
 
     fn get_model_str(&self, model: Self::Model) -> String {
@@ -21,7 +21,7 @@ impl ModelSelection for GeminiAPI {
     }
 }
 
-impl TextGenerationService for GeminiAPI {
+impl<'a> TextGenerationService for AuthedGeminiAPI<'a> {
     async fn generate_text(
         &self,
         model: GeminiModel,

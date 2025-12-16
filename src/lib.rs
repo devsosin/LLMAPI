@@ -1,5 +1,6 @@
 use reqwest::Client;
 
+pub mod client;
 pub mod errors;
 pub mod traits;
 pub mod types;
@@ -8,14 +9,20 @@ pub mod types;
 pub mod gpt;
 
 #[cfg(feature = "gpt")]
-pub struct GptAPI {
-    client: Client,
+pub struct AuthedGPTAPI<'a> {
+    api: &'a LLMAPI,
+    token: &'a str,
 }
 
 #[cfg(feature = "gemini")]
 pub mod gemini;
 
 #[cfg(feature = "gemini")]
-pub struct GeminiAPI {
+pub struct AuthedGeminiAPI<'a> {
+    api: &'a LLMAPI,
+    token: &'a str,
+}
+
+pub struct LLMAPI {
     client: Client,
 }
