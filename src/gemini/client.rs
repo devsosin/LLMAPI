@@ -12,9 +12,22 @@ impl<'a> AuthedGeminiAPI<'a> {
     ) -> ClientResult<U> {
         let res = self
             .api
-            .build_request(&url)
+            .build_post(&url)
             .header("x-goog-api-key", self.token)
             .json(&body)
+            .send()
+            .await?;
+
+        parse_body(res).await
+    }
+    pub async fn send_get<U: for<'de> Deserialize<'de> + fmt::Debug>(
+        &self,
+        url: String,
+    ) -> ClientResult<U> {
+        let res = self
+            .api
+            .build_get(&url)
+            .header("x-goog-api-key", self.token)
             .send()
             .await?;
 

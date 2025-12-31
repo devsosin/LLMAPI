@@ -44,8 +44,12 @@ impl LLMAPI {
         AuthedGeminiAPI { api: self, token }
     }
 
-    pub fn build_request(&self, url: &str) -> RequestBuilder {
+    pub fn build_post(&self, url: &str) -> RequestBuilder {
         self.client.post(url)
+    }
+
+    pub fn build_get(&self, url: &str) -> RequestBuilder {
+        self.client.get(url)
     }
 }
 
@@ -53,14 +57,16 @@ pub async fn parse_body<B: for<'de> Deserialize<'de> + fmt::Debug>(
     res: Response,
 ) -> ClientResult<B> {
     if !res.status().is_success() {
-        let response: ErrorResponse = res.json().await.unwrap();
+        let response: ErrorResponse = match res.json().await {
+            Ok(r) => r,
+            Err(_) => return Err(ClientError::ValidationError("No Response".to_string())),
+        };
 
         return Err(ClientError::ValidationError(
             response.get_message().to_string(),
         ));
     }
 
-    // println!("{:?}", res.text().await.unwrap());
     let res_body = res.json::<B>().await.unwrap();
 
     Ok(res_body)

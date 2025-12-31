@@ -9,7 +9,7 @@ mod test {
     };
 
     #[tokio::test]
-    async fn test_gpt_text_generation() {
+    async fn test_text_generation() {
         dotenv().ok();
 
         let api = LLMAPI::from_env();
@@ -24,5 +24,27 @@ mod test {
             .unwrap();
 
         println!("{:?}", result.get_content());
+    }
+
+    #[tokio::test]
+    async fn test_batch_generation() {
+        dotenv().ok();
+
+        let api = LLMAPI::from_env();
+        let api_key =
+            env::var("GOOGLE_API_KEY").expect("Failed to load env variable: GOOGLE_API_KEY");
+        let api = api.authed_gemini(&api_key);
+
+        let requests = vec![
+            AgentTextRequest::new("", "hello gemini !", false),
+            AgentTextRequest::new("", "how are you?", false),
+        ];
+
+        let result = api
+            .batch_generate_text(GeminiModel::Gemini3FlashPreview, requests)
+            .await
+            .unwrap();
+
+        println!("{:?}", result);
     }
 }
