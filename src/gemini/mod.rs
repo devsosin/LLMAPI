@@ -71,7 +71,6 @@ impl<'a> TextGenerationService for AuthedGeminiAPI<'a> {
             .await?;
 
         let batch_name = response.get_name();
-        // 생각보다 좀 오래걸림.. 가격은 싸니까 괜찮..나?
         // println!("Batch Name: {}", batch_name);
 
         loop {
@@ -84,7 +83,7 @@ impl<'a> TextGenerationService for AuthedGeminiAPI<'a> {
             {
                 if let Some(done) = r.get_done() {
                     if *done {
-                        println!("Gemini Batch Response: {:?}", r);
+                        // println!("Gemini Batch Response: {:?}", r);
                         return Ok(r.get_responses());
                     }
                 }

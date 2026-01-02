@@ -80,6 +80,7 @@ pub struct InlineResponse {
 }
 
 #[derive(Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct ResponseCandidate {
     candidates: Vec<Candidate>,
     response_id: String,

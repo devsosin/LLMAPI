@@ -36,6 +36,7 @@ impl AgentTextRequest {
 }
 
 // TODO: String or byte like array? (Image)
+#[derive(Debug)]
 pub struct AgentTextResponse {
     response_id: String,
     content: String,
