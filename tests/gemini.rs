@@ -5,7 +5,10 @@ mod test {
 
     use dotenv::dotenv;
     use llm::{
-        LLMAPI, gemini::models::GeminiModel, traits::TextGenerationService, types::AgentTextRequest,
+        LLMAPI,
+        gemini::models::GeminiModel,
+        traits::TextGenerationService,
+        types::{AgentTextRequest, Thinking},
     };
 
     #[tokio::test]
@@ -17,7 +20,8 @@ mod test {
             env::var("GOOGLE_API_KEY").expect("Failed to load env variable: GOOGLE_API_KEY");
         let api = api.authed_gemini(&api_key);
 
-        let request = AgentTextRequest::new("You Are a Helpful Bot", "hello gemini !", false);
+        let request =
+            AgentTextRequest::new("You Are a Helpful Bot", "hello gemini !", Thinking::Minimal);
         let result = api
             .generate_text(GeminiModel::Gemini3ProPreview, request)
             .await
@@ -36,12 +40,12 @@ mod test {
         let api = api.authed_gemini(&api_key);
 
         let requests = vec![
-            AgentTextRequest::new("", "hello gemini !", false),
-            AgentTextRequest::new("", "how are you?", false),
+            AgentTextRequest::new("", "hello gemini !", Thinking::Minimal),
+            AgentTextRequest::new("", "how are you?", Thinking::Minimal),
         ];
 
         let result = api
-            .batch_generate_text(GeminiModel::Gemini3FlashPreview, requests)
+            .batch_generate_text(GeminiModel::Gemini3FlashPreview, "test", "key", requests)
             .await
             .unwrap();
 

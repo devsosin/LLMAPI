@@ -17,6 +17,8 @@ pub trait TextGenerationService: ModelSelection {
     fn batch_generate_text(
         &self,
         model: Self::Model,
+        display_name: &str,
+        key_prefix: &str,
         requests: Vec<AgentTextRequest>,
     ) -> impl Future<Output = ClientResult<Vec<AgentTextResponse>>>;
 }

@@ -1,12 +1,18 @@
+mod client;
+mod dto;
+pub mod models;
+pub(crate) mod types;
+
 use std::time::Duration;
 
 use tokio::time::sleep;
 
 use crate::{
     AuthedGeminiAPI,
+    errors::ClientError,
     gemini::{
         dto::{
-            request::{GeminiBatchRequestBody, GeminiRequestBody},
+            request::{GeminiBatchRequestBody, GenerateContentRequest},
             response::{GeminiBatchResponse, GeminiResponse},
         },
         models::GeminiModel,
@@ -14,11 +20,6 @@ use crate::{
     traits::{ModelSelection, TextGenerationService},
     types::{AgentTextRequest, AgentTextResponse, ClientResult},
 };
-
-mod client;
-mod dto;
-pub mod models;
-pub mod types;
 
 impl<'a> ModelSelection for AuthedGeminiAPI<'a> {
     type Model = GeminiModel;
@@ -34,10 +35,14 @@ impl<'a> TextGenerationService for AuthedGeminiAPI<'a> {
         model: GeminiModel,
         request: AgentTextRequest,
     ) -> ClientResult<AgentTextResponse> {
-        let body = request.into();
+        if !model.check_thinking(&request.thinking) {
+            return Err(ClientError::ValidationError("Thinking Config".into()));
+        };
+
+        let body = (&request).into();
 
         let response = self
-            .send::<GeminiRequestBody, GeminiResponse>(
+            .send::<GenerateContentRequest, GeminiResponse>(
                 format!(
                     "https://generativelanguage.googleapis.com/v1beta/models/{}:generateContent",
                     model.to_string()
@@ -54,11 +59,15 @@ impl<'a> TextGenerationService for AuthedGeminiAPI<'a> {
     async fn batch_generate_text(
         &self,
         model: Self::Model,
+        display_name: &str,
+        key_prefix: &str,
         requests: Vec<AgentTextRequest>,
     ) -> ClientResult<Vec<AgentTextResponse>> {
-        // display_name 설정
-        // 각 metadata key 설정 -> 결과 매칭용..? -> 순서대로 나오긴 하는듯..한데
-        let body = GeminiBatchRequestBody::from_requests("test", requests.into());
+        if !model.check_thinking(&requests[0].thinking) {
+            return Err(ClientError::ValidationError("Thinking Config".into()));
+        };
+
+        let body = GeminiBatchRequestBody::from_requests(display_name, key_prefix, requests.into());
 
         let response = self
             .send::<GeminiBatchRequestBody, GeminiBatchResponse>(

@@ -19,18 +19,26 @@ impl From<String> for LLMProvider {
     }
 }
 
+#[derive(PartialEq, Eq)]
+pub enum Thinking {
+    High,
+    Low,
+    Medium,
+    Minimal,
+}
+
 pub struct AgentTextRequest {
     pub instruction: String,
     pub input: String,
-    pub think_more: bool,
+    pub thinking: Thinking,
 }
 
 impl AgentTextRequest {
-    pub fn new(instruction: &str, input: &str, think_more: bool) -> Self {
+    pub fn new(instruction: &str, input: &str, thinking: Thinking) -> Self {
         Self {
             instruction: instruction.into(),
             input: input.into(),
-            think_more,
+            thinking,
         }
     }
 }

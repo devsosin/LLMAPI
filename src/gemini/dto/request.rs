@@ -2,13 +2,13 @@ use serde::Serialize;
 
 use crate::{
     gemini::types::{Content, Part},
-    types::AgentTextRequest,
+    types::{AgentTextRequest, Thinking},
 };
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct GeminiRequestBody {
-    system_instruction: Content,
+pub struct GenerateContentRequest {
+    system_instruction: Option<Content>,
     contents: Vec<Content>,
     generation_config: Option<GenerationConfig>,
 }
@@ -22,32 +22,35 @@ struct GenerationConfig {
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 struct ThinkingConfig {
-    // Option String, enum?
     thinking_level: String,
 }
 
-// Thinking Level - low, high(default)
-//              only Flash => medium, minimal(=no thinking)
+impl From<&Thinking> for ThinkingConfig {
+    fn from(t: &Thinking) -> Self {
+        let thinking_level = match t {
+            Thinking::High => "high",
+            Thinking::Low => "low",
+            Thinking::Medium => "medium",
+            Thinking::Minimal => "minimal",
+        }
+        .into();
 
-impl From<AgentTextRequest> for GeminiRequestBody {
-    fn from(req: AgentTextRequest) -> Self {
+        ThinkingConfig { thinking_level }
+    }
+}
+
+impl From<&AgentTextRequest> for GenerateContentRequest {
+    fn from(req: &AgentTextRequest) -> Self {
         Self {
-            system_instruction: Content::new(vec![Part::new(&req.instruction)], None),
+            system_instruction: Some(Content::new(vec![Part::new(&req.instruction)], None)),
             contents: vec![Content::new(vec![Part::new(&req.input)], None)],
-            generation_config: if (req.think_more) {
-                Some(GenerationConfig {
-                    thinking_config: ThinkingConfig {
-                        thinking_level: "low".into(),
-                    },
-                })
-            } else {
-                None
-            },
+            generation_config: Some(GenerationConfig {
+                thinking_config: (&req.thinking).into(),
+            }),
         }
     }
 }
 
-// GeminiBatchRequestBody { batch : {display_name, input_config: requests: {requests: [{request:{contents}, metadata: {key}}]}}}
 #[derive(Serialize)]
 pub struct GeminiBatchRequestBody {
     batch: BatchBody,
@@ -71,13 +74,8 @@ struct Requests {
 
 #[derive(Serialize)]
 struct BatchRequestContent {
-    request: RequestContent,
+    request: GenerateContentRequest,
     metadata: Metadata,
-}
-
-#[derive(Serialize)]
-struct RequestContent {
-    contents: Vec<Content>,
 }
 
 #[derive(Serialize)]
@@ -86,7 +84,11 @@ struct Metadata {
 }
 
 impl GeminiBatchRequestBody {
-    pub fn from_requests(display_name: &str, requests: Vec<AgentTextRequest>) -> Self {
+    pub fn from_requests(
+        display_name: &str,
+        key_prefix: &str,
+        requests: Vec<AgentTextRequest>,
+    ) -> Self {
         Self {
             batch: BatchBody {
                 display_name: display_name.into(),
@@ -94,11 +96,12 @@ impl GeminiBatchRequestBody {
                     requests: Requests {
                         requests: requests
                             .iter()
-                            .map(|r| BatchRequestContent {
-                                request: RequestContent {
-                                    contents: vec![Content::new(vec![Part::new(&r.input)], None)],
+                            .enumerate()
+                            .map(|(i, r)| BatchRequestContent {
+                                request: r.into(),
+                                metadata: Metadata {
+                                    key: format!("{}_{}", key_prefix, i),
                                 },
-                                metadata: Metadata { key: "()".into() },
                             })
                             .collect(),
                     },
